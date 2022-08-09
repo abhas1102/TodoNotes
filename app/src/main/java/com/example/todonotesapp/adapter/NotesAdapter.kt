@@ -6,8 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.CompoundButton
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.todonotesapp.R
 import com.example.todonotesapp.clicklistener.ItemClickListener
 import com.example.todonotesapp.db.Notes
@@ -18,6 +20,7 @@ class NotesAdapter(val list:List<Notes>, val itemClickListener: ItemClickListene
         val textViewTitle : TextView = itemView.findViewById(R.id.textViewTitle)
         val textViewDescription : TextView = itemView.findViewById(R.id.textViewDescription)
         val checkBoxMarkStatus:CheckBox = itemView.findViewById(R.id.checkBoxMarkStatus)
+        val imageView: ImageView = itemView.findViewById(R.id.imageView)
 
     }
 
@@ -32,6 +35,8 @@ class NotesAdapter(val list:List<Notes>, val itemClickListener: ItemClickListene
         val description = notes.description
         holder.textViewTitle.text = title
         holder.textViewDescription.text = description
+        holder.checkBoxMarkStatus.isChecked = notes.isTaskCompleted
+        Glide.with(holder.itemView).load(notes.imagePath).into(holder.imageView)
 
         holder.itemView.setOnClickListener(object : View.OnClickListener{
             override fun onClick(v: View?) {
@@ -41,6 +46,7 @@ class NotesAdapter(val list:List<Notes>, val itemClickListener: ItemClickListene
         })
         holder.checkBoxMarkStatus.setOnCheckedChangeListener(object :CompoundButton.OnCheckedChangeListener{
             override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
+                notes.isTaskCompleted = isChecked
                 itemClickListener.onUpdate(notes)
             }
 

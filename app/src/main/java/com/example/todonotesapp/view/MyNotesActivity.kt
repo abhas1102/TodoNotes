@@ -1,8 +1,10 @@
 package com.example.todonotesapp.view
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
@@ -12,6 +14,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.work.Constraints
+import androidx.work.PeriodicWorkRequest
+import androidx.work.WorkManager
 import com.example.todonotesapp.NotesApp
 import com.example.todonotesapp.utils.AppConstants
 import com.example.todonotesapp.R
@@ -19,9 +24,14 @@ import com.example.todonotesapp.utils.SharePrefConst
 import com.example.todonotesapp.adapter.NotesAdapter
 import com.example.todonotesapp.clicklistener.ItemClickListener
 import com.example.todonotesapp.db.Notes
+import com.example.todonotesapp.workmanager.MyWorker
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import java.util.concurrent.TimeUnit
 
 class MyNotesActivity:AppCompatActivity() {
+    companion object{
+        const val ADD_NOTES_CODE = 100
+    }
     var fullName:String = ""
     lateinit var fabAddNotes: FloatingActionButton
     lateinit var sharedPreferences: SharedPreferences
@@ -35,19 +45,30 @@ class MyNotesActivity:AppCompatActivity() {
         bindViews()
         getIntentData()
         getDataFromDb()
+
         if (supportActionBar != null) {
             supportActionBar?.title = fullName
         }
         fabAddNotes.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View?) {
-                setupDialogBox()
+               val intent = Intent(this@MyNotesActivity,AddNotesActivity::class.java)
+                startActivityForResult(intent, ADD_NOTES_CODE)
             }
 
         })
         setupRecyclerView()
+        setupWorkManager()
 
 
 
+    }
+
+
+    private fun setupWorkManager() {
+        val constraint = Constraints.Builder().build()
+        val request = PeriodicWorkRequest.Builder(MyWorker::class.java, 15, TimeUnit.MINUTES).
+        setConstraints(constraint).build()
+        WorkManager.getInstance().enqueue(request)
     }
 
 
@@ -58,7 +79,7 @@ class MyNotesActivity:AppCompatActivity() {
         notesList.addAll(listOfNotes)
     }
 
-    private fun setupDialogBox() {
+   /* private fun setupDialogBox() {
         val view = LayoutInflater.from(this@MyNotesActivity).inflate(R.layout.add_notes_dialog_layout, null)
         val editTextTitle = view.findViewById<EditText>(R.id.editTextTitle)
         val editTextDescription = view.findViewById<EditText>(R.id.editTextDescription)
@@ -87,7 +108,7 @@ class MyNotesActivity:AppCompatActivity() {
         dialog.show()
 
 
-    }
+    } */
 
     private fun addNotesToDb(notes: Notes) {
         // insertion to database
@@ -106,7 +127,10 @@ class MyNotesActivity:AppCompatActivity() {
             }
 
             override fun onUpdate(notes: Notes) {
-
+                // update the value on checking the notes
+                val notesApp = applicationContext as NotesApp
+                val notesDao = notesApp.getNotesDb().notesDao()
+                notesDao.updateNotes(notes)
             }
 
         }
@@ -140,5 +164,25 @@ class MyNotesActivity:AppCompatActivity() {
         fabAddNotes = findViewById(R.id.fabAddNotes)
         recyclerViewNotes = findViewById(R.id.recyclerViewNotes)
 
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == ADD_NOTES_CODE) {
+            if (data != null) {
+                val title = data?.getStringExtra(AppConstants.TITLE)
+                val description = data?.getStringExtra(AppConstants.DESCRIPTION)
+                val imagePath = data?.getStringExtra(AppConstants.IMAGE_PATH)
+
+                val notesApp = applicationContext as NotesApp
+                val notesDao = notesApp.getNotesDb().notesDao()
+                val note =
+                    Notes(title = title!!, description = description!!, imagePath = imagePath!!)
+
+                notesList.add(note)
+                notesDao.insert(note)
+                recyclerViewNotes.adapter?.notifyItemChanged(notesList.size - 1)
+            }
+        }
     }
 }
