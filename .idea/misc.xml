@@ -4,14 +4,17 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/TodoNotesApp/app/src/main/res/layout/activity_add_notes.xml" value="0.16485507246376813" />
+        <entry key="..\:/TodoNotesApp/app/src/main/res/layout/activity_blog.xml" value="0.16485507246376813" />
         <entry key="..\:/TodoNotesApp/app/src/main/res/layout/activity_detail.xml" value="0.1" />
         <entry key="..\:/TodoNotesApp/app/src/main/res/layout/activity_login.xml" value="0.1403985507246377" />
         <entry key="..\:/TodoNotesApp/app/src/main/res/layout/activity_main.xml" value="0.1403985507246377" />
         <entry key="..\:/TodoNotesApp/app/src/main/res/layout/activity_my_notes.xml" value="0.1" />
         <entry key="..\:/TodoNotesApp/app/src/main/res/layout/activity_splash.xml" value="0.1" />
         <entry key="..\:/TodoNotesApp/app/src/main/res/layout/add_notes_dialog_layout.xml" value="0.1" />
+        <entry key="..\:/TodoNotesApp/app/src/main/res/layout/blog_layout.xml" value="0.16485507246376813" />
         <entry key="..\:/TodoNotesApp/app/src/main/res/layout/dialog_selector.xml" value="0.1465811965811966" />
         <entry key="..\:/TodoNotesApp/app/src/main/res/layout/notes_adapter_layout.xml" value="0.1" />
+        <entry key="..\:/TodoNotesApp/app/src/main/res/menu/menu.xml" value="0.17864583333333334" />
         <entry key="..\:/TodoNotesApp/app/src/main/res/xml/provider_paths.xml" value="0.16485507246376813" />
       </map>
     </option>
